@@ -1,0 +1,1577 @@
+<!DOCTYPE html><html lang="en" class="no-js"><head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Issue #43 - Redirect unverified users to verification page - Implementation Plans</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link href="../../assets/stylesheets/glightbox.min.css" rel="stylesheet"><script src="../../assets/javascripts/glightbox.min.js"></script><style id="glightbox-style">
+            html.glightbox-open { overflow: initial; height: 100%; }
+            .gslide-title { margin-top: 0px; user-select: text; }
+            .gslide-desc { color: #666; user-select: text; }
+            .gslide-image img { background: white; }
+            .gscrollbar-fixer { padding-right: 15px; }
+            .gdesc-inner { font-size: 0.75rem; }
+            body[data-md-color-scheme="slate"] .gdesc-inner { background: var(--md-default-bg-color); }
+            body[data-md-color-scheme="slate"] .gslide-title { color: var(--md-default-fg-color); }
+            body[data-md-color-scheme="slate"] .gslide-desc { color: var(--md-default-fg-color); }
+        </style></head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#issue-43-redirect-unverified-users-to-verification-page-on-sign-in-instead-of-showing-error" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Implementation Plans" class="md-header__button md-logo" aria-label="Implementation Plans" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Implementation Plans
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Issue #43 - Redirect unverified users to verification page
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Implementation Plans" class="md-nav__button md-logo" aria-label="Implementation Plans" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+
+    </a>
+    Implementation Plans
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plans
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Plans
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issue #43 - Redirect unverified users to verification page
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Issue #43 - Redirect unverified users to verification page
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-cause-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root Cause Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Root Cause Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proposed-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proposed Solution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Proposed Solution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#high-level-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High-Level Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#technical-changes-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Changes Required
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Changes Required">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-enhanced-sign-in-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Enhanced Sign-In Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-new-verification-reminder-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. New Verification Reminder Page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-improved-resend-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Improved Resend Endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-post-verification-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Post-Verification Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-to-modify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files to Modify
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-create-unverified-email-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Create Unverified Email Page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-enhance-sign-in-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Enhance Sign-In Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-implement-resend-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Implement Resend Functionality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-post-verification-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Post-Verification Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-5-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks &amp; Mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagrams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrams
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Diagrams">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-flow-vs-proposed-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Flow vs Proposed Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Diagram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequence-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequence Diagram
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ui-mockups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UI Mockups
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UI Mockups">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unverified-email-page-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unverified Email Page Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-state-after-resending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success State After Resending
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Timeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics-for-success" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics for Success
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback Plan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#root-cause-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root Cause Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Root Cause Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current State
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Problems
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proposed-solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proposed Solution
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Proposed Solution">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#high-level-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        High-Level Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#technical-changes-required" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Changes Required
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Technical Changes Required">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-enhanced-sign-in-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Enhanced Sign-In Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-new-verification-reminder-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. New Verification Reminder Page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-improved-resend-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Improved Resend Endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-post-verification-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Post-Verification Handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-to-modify" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files to Modify
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New Files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Steps
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-1-create-unverified-email-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 1: Create Unverified Email Page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-2-enhance-sign-in-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 2: Enhance Sign-In Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-3-implement-resend-functionality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 3: Implement Resend Functionality
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-4-post-verification-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 4: Post-Verification Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-5-testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase 5: Testing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Strategy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Test Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unit Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#risks-mitigations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Risks &amp; Mitigations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#diagrams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrams
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Diagrams">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#current-flow-vs-proposed-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Flow vs Proposed Flow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Diagram
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequence-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sequence Diagram
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ui-mockups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        UI Mockups
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="UI Mockups">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unverified-email-page-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unverified Email Page Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#success-state-after-resending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Success State After Resending
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Timeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics-for-success" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics for Success
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rollback-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rollback Plan
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="issue-43-redirect-unverified-users-to-verification-page-on-sign-in-instead-of-showing-error">Issue #43: Redirect unverified users to verification page on sign-in instead of showing error</h1>
+<h2 id="summary">Summary</h2>
+<p>Currently, when unverified users attempt to sign in, they receive a generic "Invalid email or password" error. This is confusing since their account exists but is not verified. The goal is to detect unverified accounts during sign-in and redirect users to the verification page with appropriate messaging and options.</p>
+<h2 id="root-cause-analysis">Root Cause Analysis</h2>
+<h3 id="current-state">Current State</h3>
+<ol>
+<li>Users sign up with email/password</li>
+<li>They receive a verification email but may not complete the process</li>
+<li>When they try to sign in, the <code>authorize</code> function in <code>src/lib/auth.ts</code> throws an <code>EmailNotVerified</code> error</li>
+<li>The frontend catches this error and displays "Please verify your email before signing in. Check your inbox for the verification link."</li>
+<li>However, this is still an error message on the sign-in page, not a helpful redirect</li>
+</ol>
+<h3 id="problems">Problems</h3>
+<ul>
+<li>Users see an error message instead of being guided to the solution</li>
+<li>No direct way to resend verification email from the sign-in page</li>
+<li>Poor user experience for a common scenario</li>
+</ul>
+<h2 id="proposed-solution">Proposed Solution</h2>
+<h3 id="high-level-approach">High-Level Approach</h3>
+<ol>
+<li><strong>Enhanced Detection</strong>: Improve the sign-in flow to better handle unverified accounts</li>
+<li><strong>Smart Redirection</strong>: Redirect unverified users to a dedicated verification page with context</li>
+<li><strong>Clear Messaging</strong>: Provide explicit guidance about what happened and how to fix it</li>
+<li><strong>Resend Option</strong>: Include a prominent button to resend the verification email</li>
+<li><strong>Seamless Return</strong>: After verification, automatically redirect back to sign-in or dashboard</li>
+</ol>
+<h3 id="technical-changes-required">Technical Changes Required</h3>
+<h4 id="1-enhanced-sign-in-logic">1. Enhanced Sign-In Logic</h4>
+<p>Modify the sign-in handler to:
+- Catch the <code>EmailNotVerified</code> error specifically
+- Store the user's email temporarily (via URL parameter or session storage)
+- Redirect to a new verification reminder page instead of showing an error</p>
+<h4 id="2-new-verification-reminder-page">2. New Verification Reminder Page</h4>
+<p>Create a dedicated page that:
+- Explains the situation clearly
+- Shows the email address that needs verification
+- Provides a resend verification button
+- Offers troubleshooting options</p>
+<h4 id="3-improved-resend-endpoint">3. Improved Resend Endpoint</h4>
+<p>Ensure the resend endpoint can handle the redirect flow properly</p>
+<h4 id="4-post-verification-handling">4. Post-Verification Handling</h4>
+<p>After successful verification, redirect to sign-in with a success message</p>
+<h2 id="files-to-modify">Files to Modify</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/app/signin/page.tsx</code></td>
+<td>Enhance error handling to redirect unverified users to verification reminder page</td>
+</tr>
+<tr>
+<td><code>src/lib/auth.ts</code></td>
+<td>Ensure consistent error throwing for unverified accounts</td>
+</tr>
+<tr>
+<td><code>src/app/api/auth/resend-verification/route.ts</code></td>
+<td>Add support for redirect context</td>
+</tr>
+<tr>
+<td><code>src/app/verify-email/page.tsx</code></td>
+<td>Add success redirect to sign-in with message</td>
+</tr>
+</tbody>
+</table>
+<h2 id="new-files">New Files</h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/app/unverified-email/page.tsx</code></td>
+<td>New page that explains email verification requirement and provides resend option</td>
+</tr>
+<tr>
+<td><code>src/components/ui/verification-form.tsx</code> (optional)</td>
+<td>Reusable component for verification-related forms</td>
+</tr>
+</tbody>
+</table>
+<h2 id="implementation-steps">Implementation Steps</h2>
+<h3 id="phase-1-create-unverified-email-page">Phase 1: Create Unverified Email Page</h3>
+<ol>
+<li>Create <code>src/app/unverified-email/page.tsx</code> with:</li>
+<li>Clear heading: "Email verification required"</li>
+<li>Explanation of why they're seeing this page</li>
+<li>Display of the email address needing verification</li>
+<li>Prominent "Resend verification email" button</li>
+<li>Link to contact support if issues persist</li>
+<li>Automatic redirect to sign-in after successful verification</li>
+</ol>
+<h3 id="phase-2-enhance-sign-in-logic">Phase 2: Enhance Sign-In Logic</h3>
+<ol>
+<li>Modify <code>src/app/signin/page.tsx</code>:</li>
+<li>In <code>handleEmailSignIn</code>, when catching <code>EmailNotVerified</code> error:<ul>
+<li>Store email in sessionStorage</li>
+<li>Redirect to <code>/unverified-email?email=${encodeURIComponent(email)}</code></li>
+</ul>
+</li>
+<li>Remove the inline error display for unverified accounts</li>
+</ol>
+<h3 id="phase-3-implement-resend-functionality">Phase 3: Implement Resend Functionality</h3>
+<ol>
+<li>Update the unverified email page to:</li>
+<li>Call the existing <code>/api/auth/resend-verification</code> endpoint</li>
+<li>Show success/error feedback</li>
+<li>Disable button during request</li>
+</ol>
+<h3 id="phase-4-post-verification-flow">Phase 4: Post-Verification Flow</h3>
+<ol>
+<li>Modify <code>src/app/verify-email/page.tsx</code>:</li>
+<li>After successful verification, redirect to <code>/signin?message=email-verified</code></li>
+<li>Add success message handling in sign-in page</li>
+</ol>
+<h3 id="phase-5-testing">Phase 5: Testing</h3>
+<ol>
+<li>Test with unverified account: should redirect to unverified page</li>
+<li>Test resend functionality: should show success message</li>
+<li>Test verification completion: should redirect to sign-in</li>
+<li>Test verified account: should sign in normally</li>
+<li>Test edge cases: invalid emails, rate limiting, etc.</li>
+</ol>
+<h2 id="test-strategy">Test Strategy</h2>
+<h3 id="unit-tests">Unit Tests</h3>
+<ul>
+<li>Test error detection in sign-in handler</li>
+<li>Test redirect logic for unverified users</li>
+<li>Test email validation in resend endpoint</li>
+<li>Test sessionStorage usage</li>
+</ul>
+<h3 id="integration-tests">Integration Tests</h3>
+<ul>
+<li>Full flow: signup → sign-in attempt → verification → successful sign-in</li>
+<li>Resend verification email functionality</li>
+<li>Multiple verification attempts</li>
+</ul>
+<h3 id="edge-cases">Edge Cases</h3>
+<ul>
+<li>Invalid email formats</li>
+<li>Rate limiting on resend requests</li>
+<li>Expired verification tokens</li>
+<li>Concurrent verification attempts</li>
+<li>Mobile vs desktop UX</li>
+</ul>
+<h2 id="risks-mitigations">Risks &amp; Mitigations</h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Security</strong>: Email enumeration through redirect timing</td>
+<td>Use consistent timing for all sign-in attempts, always redirect after same delay</td>
+</tr>
+<tr>
+<td><strong>UX Confusion</strong>: Users might not understand why they were redirected</td>
+<td>Clear messaging explaining the verification requirement and next steps</td>
+</tr>
+<tr>
+<td><strong>Rate Limiting</strong>: Spam of resend requests</td>
+<td>Implement server-side rate limiting on resend endpoint</td>
+</tr>
+<tr>
+<td><strong>Session Issues</strong>: Losing email context during redirects</td>
+<td>Use both URL parameters and sessionStorage for redundancy</td>
+</tr>
+<tr>
+<td><strong>Mobile UX</strong>: Poor experience on small screens</td>
+<td>Design responsive layout, test on various devices</td>
+</tr>
+</tbody>
+</table>
+<h2 id="diagrams">Diagrams</h2>
+<h3 id="current-flow-vs-proposed-flow">Current Flow vs Proposed Flow</h3>
+<p><strong>Current Flow:</strong></p>
+<pre><code>User signs in → System detects unverified account → Shows error message → User confused
+</code></pre>
+<p><strong>Proposed Flow:</strong></p>
+<pre><code>User signs in → System detects unverified account → Redirects to verification reminder page → User understands issue → Can resend email → Completes verification → Successfully signs in
+</code></pre>
+<h3 id="architecture-diagram">Architecture Diagram</h3>
+<p>The flow involves:
+1. Frontend sign-in form
+2. NextAuth authorization
+3. Database check for email verification status
+4. Redirect to custom verification reminder page
+5. Resend API endpoint
+6. Email service integration
+7. Post-verification redirect back to sign-in</p>
+<h3 id="sequence-diagram">Sequence Diagram</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    User-&gt;&gt;Frontend: Submit sign-in form
+    Frontend-&gt;&gt;NextAuth: signIn() call
+    NextAuth-&gt;&gt;Database: Check user credentials
+    Database--&gt;&gt;NextAuth: User found (unverified)
+    NextAuth--&gt;&gt;Frontend: EmailNotVerified error
+    Frontend-&gt;&gt;Frontend: Store email, redirect to /unverified-email
+    User-&gt;&gt;UnverifiedPage: Views verification reminder
+    User-&gt;&gt;UnverifiedPage: Click "Resend email"
+    UnverifiedPage-&gt;&gt;API: POST /resend-verification
+    API-&gt;&gt;EmailService: Send verification email
+    EmailService--&gt;&gt;API: Success
+    API--&gt;&gt;UnverifiedPage: Success message
+    User-&gt;&gt;EmailClient: Open verification link
+    EmailClient-&gt;&gt;VerifyPage: GET /verify-email?token=...
+    VerifyPage-&gt;&gt;API: POST /verify-email
+    API-&gt;&gt;Database: Mark email as verified
+    API--&gt;&gt;VerifyPage: Success
+    VerifyPage-&gt;&gt;SignIn: Redirect with success message
+</code></pre>
+<h2 id="ui-mockups">UI Mockups</h2>
+<h3 id="unverified-email-page-design">Unverified Email Page Design</h3>
+<pre><code class="language-html">&lt;!-- Header with logo --&gt;
+&lt;div class="min-h-screen flex flex-col"&gt;
+  &lt;header&gt;Fabric Logo&lt;/header&gt;
+
+  &lt;main&gt;
+    &lt;div class="max-w-md mx-auto"&gt;
+      &lt;!-- Icon --&gt;
+      &lt;div class="w-16 h-16 mx-auto mb-6 bg-yellow-500/10 rounded-full flex items-center justify-center"&gt;
+        &lt;svg class="w-8 h-8 text-yellow-500"&gt;Warning Icon&lt;/svg&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Heading --&gt;
+      &lt;h1 class="text-2xl font-bold mb-2 text-center"&gt;Email verification required&lt;/h1&gt;
+
+      &lt;!-- Subheading --&gt;
+      &lt;p class="text-muted-foreground text-center mb-6"&gt;
+        Your account exists but hasn't been verified yet. Check your email for the verification link.
+      &lt;/p&gt;
+
+      &lt;!-- Email display --&gt;
+      &lt;div class="bg-muted p-3 rounded-lg mb-6 flex items-center justify-between"&gt;
+        &lt;span class="text-sm"&gt;user@example.com&lt;/span&gt;
+        &lt;button class="text-xs text-primary"&gt;Copy&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Resend button --&gt;
+      &lt;button class="w-full h-12 bg-primary text-primary-foreground rounded-lg font-medium mb-4"&gt;
+        Resend verification email
+      &lt;/button&gt;
+
+      &lt;!-- Troubleshooting --&gt;
+      &lt;div class="text-center text-sm text-muted-foreground space-y-2"&gt;
+        &lt;p&gt;Didn't receive the email?&lt;/p&gt;
+        &lt;p&gt;Check your spam folder or &lt;a class="text-primary"&gt;contact support&lt;/a&gt;&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Back link --&gt;
+      &lt;div class="mt-8 text-center"&gt;
+        &lt;a href="/signin" class="text-sm text-muted-foreground hover:text-foreground"&gt;
+          ← Back to sign in
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;
+</code></pre>
+<h3 id="success-state-after-resending">Success State After Resending</h3>
+<p>Shows a success toast/message confirming the email was resent, with option to go back to sign-in.</p>
+<h2 id="implementation-timeline">Implementation Timeline</h2>
+<ul>
+<li><strong>Day 1</strong>: Create unverified email page and basic redirect logic</li>
+<li><strong>Day 2</strong>: Implement resend functionality and testing</li>
+<li><strong>Day 3</strong>: Add post-verification redirect and final testing</li>
+<li><strong>Day 4</strong>: Edge case testing and deployment</li>
+</ul>
+<h2 id="metrics-for-success">Metrics for Success</h2>
+<ul>
+<li>Reduced support tickets about "invalid credentials" for unverified accounts</li>
+<li>Increased email verification completion rates</li>
+<li>Improved user satisfaction scores for sign-in flow</li>
+<li>Lower bounce rates from sign-in page</li>
+</ul>
+<h2 id="rollback-plan">Rollback Plan</h2>
+<p>If issues arise:
+1. Feature flag to disable the redirect behavior
+2. Fallback to original error message display
+3. Monitor error rates and user feedback
+4. Hotfix deployment if critical issues found</p>
+<h2 id="future-enhancements">Future Enhancements</h2>
+<ul>
+<li>Add phone verification as alternative</li>
+<li>Implement magic links for passwordless sign-in</li>
+<li>Add CAPTCHA to prevent abuse of resend functionality</li>
+<li>Personalize verification emails based on user behavior</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  
+<script id="init-glightbox">const lightbox = GLightbox({"touchNavigation": true, "loop": false, "zoomable": true, "draggable": true, "openEffect": "zoom", "closeEffect": "zoom", "slideEffect": "slide"});
+document$.subscribe(()=>{ lightbox.reload(); });
+</script></body></html>
